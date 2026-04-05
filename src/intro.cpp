@@ -5,6 +5,7 @@
 
 
 #include "../include/intro.h"
+#include "../include/pipeline.h"
 #include <glad/glad.h>
 //glad comes first because it includes the required OpenGL headers
 #include <GLFW/glfw3.h>
@@ -25,7 +26,8 @@
 //GLFW calls this function, and it will inject the window in question, and the new width and height
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
-    std::cout << "framebuffer size: " << width << "x" << height << std::endl;
+    std::cout << "Framebuffer resized: " << width << "x" << height << std::endl;
+
 }
 
 void processInput(GLFWwindow* window) {
@@ -36,10 +38,12 @@ void processInput(GLFWwindow* window) {
 
 }
 
+
 int main() {
 
     //we initialize GLFW using init
     glfwInit();
+
     //we can now configure GLFW using window hint
     //the first option in glfwWindowHint is the option we want to change,
     //the second is the value we set it to
@@ -74,6 +78,21 @@ int main() {
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
     glViewport(0, 0, 800, 600);
+
+
+
+
+    pipeline pipelineTest;
+    int success = pipelineTest.vertexShaderTest();
+    if (!success) {
+        std::cout << "Failed to initialize pipelineTest" << std::endl;
+    } else {
+        std::cout << "Success" << std::endl;
+    }
+
+
+
+
     while(!glfwWindowShouldClose(window)){
 
         //process input
@@ -92,11 +111,18 @@ int main() {
         //when it's ready, swap it with the front buffer
         //buffers contains coordinates for every single pixel, with their coresponding colours
 
+        //dont let the name fool you, glClearColor sets the global state variable GL_COLOR_BUFFER_BIT tp
+        //a value you want
         glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT); //
+        glClear(GL_COLOR_BUFFER_BIT); //glClear sets every single pixel with the value in question (here we set as the global variable)
 
         glfwSwapBuffers(window); //swaps the current front buffer and back buffer
         glfwPollEvents(); //checks if any events were triggered like keyboard input
+
+
+
+
+
     }
 
     glfwTerminate();
