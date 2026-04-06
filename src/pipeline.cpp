@@ -32,7 +32,8 @@ float triangleVertices[] = {
      0.0f,  0.5f, 0.0f
 };
 
-
+//we need to write our shader scripts using OpenGL Shading Language (GLSL).
+//These 2, the vertex shader accepts
 const char *vertexShaderSource = "#version 330 core\n"
     "layout (location = 0) in vec3 aPos;\n"
     "void main()\n"
@@ -66,12 +67,36 @@ int pipeline::vertexShaderTest() {
     //it is referenced by id so we create an int, unsigned (memory address cant be negative)
     unsigned int vertexShaderID = glCreateShader(GL_VERTEX_SHADER);
 
+    //first arg is the shader object to compile to, second arg is how many strings we're passing as source code
+    //third arg is the actual source code, last idek
+    //the vertex shader source is the code we are using that we defined above this funciton
+    glShaderSource(vertexShaderID, 1, &vertexShaderSource, NULL);
+    glCompileShader(vertexShaderID);
+
+
 
     //this is the fragementShader, it is used to figure out the colour output of the pixels
+    //notice the source script code can be found above the function
     unsigned int fragmentShaderID;
     fragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragmentShaderID, 1, &fragmentShaderSource, NULL);
     glCompileShader(fragmentShaderID);
+
+    //the shader program object is the final linked version of multiple shaders combined
+    //to use the compiled shaders we made (vertex, fragment) we need to consolidate them here
+    unsigned int shaderProgram;
+    shaderProgram = glCreateProgram();
+    glAttachShader(shaderProgram, vertexShaderID); //vertex
+    glAttachShader(shaderProgram, fragmentShaderID); //fragment
+    glLinkProgram(shaderProgram); //links them all together
+
+    //since we've linked the shaders they are no longer needed
+    //you can destroy them to free up memory
+    glDeleteShader(vertexShaderID);
+    glDeleteShader(fragmentShaderID);
+
+
+
 
     //the vertexBufferObject VBO stores large nuber of vertices in the GPUs memory
     //a benefit of this is we can send large batches of data to this bugger in gpu memory
@@ -98,26 +123,10 @@ int pipeline::vertexShaderTest() {
     glBufferData(GL_ARRAY_BUFFER, sizeof(triangleVertices), triangleVertices, GL_STATIC_DRAW);
 
 
-    //first arg is the shader object to compile to, second arg is how many strings we're passing as source code
-    //third arg is the actual source code, last idek
-    glShaderSource(vertexShaderID, 1, &vertexShaderSource, NULL);
-    glCompileShader(vertexShaderID);
-
     int success;
     char infolog[1024];
 
-    //the shader program object is the final linked version of multiple shaders combined
-    //to use the compiled shaders we made (vertex, fragment) we need to consolidate them here
-    unsigned int shaderProgram;
-    shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vertexShaderID); //vertex
-    glAttachShader(shaderProgram, fragmentShaderID); //fragment
-    glLinkProgram(shaderProgram); //links them all together
 
-    //since we've linked the shaders they are no longer needed
-    //you can destroy them to free up memory
-    glDeleteShader(vertexShaderID);
-    glDeleteShader(fragmentShaderID);
 
     //check for compile time errors and return the value to success
     glGetShaderiv(vertexShaderID, GL_COMPILE_STATUS, &success);
