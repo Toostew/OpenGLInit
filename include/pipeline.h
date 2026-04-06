@@ -8,7 +8,11 @@
 
 class pipeline {
 public:
-    int vertexShaderTest();
+    int shaderConfig();
+    void draw();
+private:
+    unsigned int globShaderProgram;
+    unsigned int globVAO;
 };
 
 

@@ -35,6 +35,11 @@ float triangleVertices[] = {
 //we need to write our shader scripts using OpenGL Shading Language (GLSL).
 //These 2, the vertex shader accepts
 const char *vertexShaderSource = "#version 330 core\n"
+    //the layout (location = 0), you can imagine it as a http port. different port can handle different data
+    //in this instance, the port at location 0 specifically is for vector3 coords.
+    //if you wanted to handle more types of data, you need to be able to "slice" it up into parts and send them
+    //to the appropriate locations (ports).
+    //we do this in the glVertexAttribPointer() function call
     "layout (location = 0) in vec3 aPos;\n"
     "void main()\n"
     "{\n"
@@ -52,8 +57,8 @@ const char *fragmentShaderSource = "#version 330 core\n"
 
 
 
-
-
+unsigned int globShaderProgram;
+unsigned int globVAO;
 
 
 
@@ -62,7 +67,18 @@ const char *fragmentShaderSource = "#version 330 core\n"
 //Think of it as a store. We need to provide what we want, give instructions, fire it up and accept output. all that complexity is abstracted away
 
 
-int pipeline::vertexShaderTest() {
+int pipeline::shaderConfig() {
+
+    //Vertex Array Object VAO
+    //you can think of the VAO as like a recording, we record every action, and then when we save it.
+    //the thing is that without VAO we'd have to repeat all the following code, for each object.
+    //with VAO it basically repeats everything we've config'd with every new object
+    unsigned int VAO;
+    glGenVertexArrays(1, &VAO);
+    glBindVertexArray(VAO);
+
+
+
     //in order for openGL to use our shader we need to pass it over via an object
     //it is referenced by id so we create an int, unsigned (memory address cant be negative)
     unsigned int vertexShaderID = glCreateShader(GL_VERTEX_SHADER);
@@ -89,6 +105,18 @@ int pipeline::vertexShaderTest() {
     glAttachShader(shaderProgram, vertexShaderID); //vertex
     glAttachShader(shaderProgram, fragmentShaderID); //fragment
     glLinkProgram(shaderProgram); //links them all together
+
+    int success;
+    char infolog[1024];
+
+
+
+    //check for compile time errors and return the value to success
+    glGetShaderiv(vertexShaderID, GL_COMPILE_STATUS, &success); //check the vertexShader
+    glGetShaderiv(fragmentShaderID, GL_INFO_LOG_LENGTH, &success); //check the fragmentShader
+    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success); //check the shader program
+
+
 
     //since we've linked the shaders they are no longer needed
     //you can destroy them to free up memory
@@ -123,15 +151,46 @@ int pipeline::vertexShaderTest() {
     glBufferData(GL_ARRAY_BUFFER, sizeof(triangleVertices), triangleVertices, GL_STATIC_DRAW);
 
 
-    int success;
-    char infolog[1024];
 
 
 
-    //check for compile time errors and return the value to success
-    glGetShaderiv(vertexShaderID, GL_COMPILE_STATUS, &success);
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+
+
+    //so far, in order, we've created and compiled our shaders (vertex and fragment)
+    //we've linked the 2 shaders into one shader program
+    //we've created a VBO to be able to send the vertex data in batches to the GPU
+    //we've set all the appropriate infrastructure to allow the VBO to be used (Buffers)
+
+
+    //before we continue to render something, we need to set how our vertex shader accepts input
+    //the vertex shader allows us to process any input we want, but we need to also tell it how to interpret input
+    //since we are sending it data as an array of values, we need to split these values into chunks
+    //in this example we are only using vector3 coords, so we only need one chunk
+    //the first param is the index (location), essentially the port we are using for this data. Maps to a field in the vertex shader
+    //second is the size, or the number of sub-values that make up this value. Here, we are sending vector3 data, so XYZ (3)
+    //third is the type of data we are sending, here, vector 3 is made up of 3 float values, so it's GL_FLOAT
+    //fourth is normalized, meaning should the values be in between 0.0-1.0. since this is position data we set it to false
+    //fifth is the stride, in other words the space to get to consecutive, distinct values in the array, measured in bytes
+    //since we are sending the data in an array, you can think of the data as (x1,y1,z1,x2,y2,z2,...)
+    //the stride is the distance between each distinct vector3 XYZ, so like the distance difference between x1 and x2
+    //in this case, each distinct vertex starts every 3 values. to get to the next distinct value, you need to hop the entire size in bytes of the first value
+    //the last one is the offset, basically where the start of the specific value type you want is in the array.
+    //this is only a big issue if the array you're parsing contains more than one types of data
+    //in this example, we are only sending vec3 coords, so it's set to 0 (the weird void* casting idek)
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    globShaderProgram = shaderProgram;
+    globVAO = VAO;
+
+
     return success;
+}
+
+void pipeline::draw() {
+    glUseProgram(globShaderProgram);
+    glBindVertexArray(globVAO);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
 

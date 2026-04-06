@@ -83,7 +83,7 @@ int main() {
 
 
     pipeline pipelineTest;
-    int success = pipelineTest.vertexShaderTest();
+    int success = pipelineTest.shaderConfig();
     if (!success) {
         std::cout << "Failed to initialize pipelineTest" << std::endl;
     } else {
@@ -94,6 +94,9 @@ int main() {
 
 
     while(!glfwWindowShouldClose(window)){
+
+
+
 
         //process input
         processInput(window);
@@ -113,8 +116,13 @@ int main() {
 
         //dont let the name fool you, glClearColor sets the global state variable GL_COLOR_BUFFER_BIT tp
         //a value you want
-        glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT); //glClear sets every single pixel with the value in question (here we set as the global variable)
+
+
+        //draw the triangle in the back buffer
+        pipelineTest.draw();
+
 
         glfwSwapBuffers(window); //swaps the current front buffer and back buffer
         glfwPollEvents(); //checks if any events were triggered like keyboard input
