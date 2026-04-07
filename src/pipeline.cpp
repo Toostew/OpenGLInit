@@ -26,10 +26,21 @@
 
 //step 1, we need coordinates of something to represent. here, a triangle
 //here we list the X, Y and Z coords for 3 points. note the Z coords are 0, so it's 2D
+//understand that in graphics, triangles is the fundamental shape that all other shapes are comprised of.
+//look up why online shits too long here
 float triangleVertices[] = {
-    -0.5f, -0.5f, 0.0f,
-     0.5f, -0.5f, 0.0f,
-     0.0f,  0.5f, 0.0f
+    // first triangle
+    0.5f,  0.5f, 0.0f,  // top right
+    0.5f, -0.5f, 0.0f,  // bottom right
+   -0.5f,  0.5f, 0.0f,  // top left
+
+};
+
+float squareVertices[] = {
+    0.5f,  0.5f, 0.0f,  // top right
+     0.5f, -0.5f, 0.0f,  // bottom right
+    -0.5f, -0.5f, 0.0f,  // bottom left
+    -0.5f,  0.5f, 0.0f   // top left
 };
 
 //we need to write our shader scripts using OpenGL Shading Language (GLSL).
@@ -151,11 +162,6 @@ int pipeline::shaderConfig() {
     glBufferData(GL_ARRAY_BUFFER, sizeof(triangleVertices), triangleVertices, GL_STATIC_DRAW);
 
 
-
-
-
-
-
     //so far, in order, we've created and compiled our shaders (vertex and fragment)
     //we've linked the 2 shaders into one shader program
     //we've created a VBO to be able to send the vertex data in batches to the GPU
@@ -187,10 +193,84 @@ int pipeline::shaderConfig() {
     return success;
 }
 
+//this is the function to demostrate Element Buffer Objects
+int pipeline::EBOConfig() {
+
+    unsigned int indices[] = {  // note that we start from 0!
+        0, 1, 3,   // first triangle
+        1, 2, 3    // second triangle
+    };
+
+
+
+    //init the VAO
+    unsigned int VAO; //think of the VAO as a recording that records the configuration state
+    glGenVertexArrays(1, &VAO);
+    glBindVertexArray(VAO);
+
+    //init the vertex shader
+    unsigned int vertexShaderID = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertexShaderID, 1, &vertexShaderSource, NULL);
+    glCompileShader(vertexShaderID);
+
+    //init the fragment shader
+    unsigned int fragmentShaderID;
+    fragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragmentShaderID, 1, &fragmentShaderSource, NULL);
+    glCompileShader(fragmentShaderID);
+
+    //consolidate shaders in the shader program
+    unsigned int shaderProgram;
+    shaderProgram = glCreateProgram();
+    glAttachShader(shaderProgram, vertexShaderID); //vertex
+    glAttachShader(shaderProgram, fragmentShaderID); //fragment
+    glLinkProgram(shaderProgram); //links them all together
+
+    int success;
+    char infolog[1024];
+
+    //verify the shaders work
+    glGetShaderiv(vertexShaderID, GL_COMPILE_STATUS, &success); //check the vertexShader
+    glGetShaderiv(fragmentShaderID, GL_INFO_LOG_LENGTH, &success); //check the fragmentShader
+    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success); //check the shader program
+
+    //delete the shaders, we have already combined so these can go
+    glDeleteShader(vertexShaderID);
+    glDeleteShader(fragmentShaderID);
+
+    //create VBOs
+    unsigned int vertexBufferObject;
+    glGenBuffers(1, &vertexBufferObject);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(squareVertices), squareVertices, GL_STATIC_DRAW);
+
+
+    //now we create the Element Buffer Objects EBOs, very similar to process of VBOs
+    unsigned int EBO;
+    glGenBuffers(1, &EBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    globShaderProgram = shaderProgram;
+    globVAO = VAO;
+
+    return success;
+}
+
+
 void pipeline::draw() {
     glUseProgram(globShaderProgram);
     glBindVertexArray(globVAO);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    glDrawArrays(GL_TRIANGLES, 0, 3); //the number of points to draw
+}
+
+void pipeline::drawEBO() {
+    glUseProgram(globShaderProgram);
+    glBindVertexArray(globVAO);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
 

@@ -83,7 +83,7 @@ int main() {
 
 
     pipeline pipelineTest;
-    int success = pipelineTest.shaderConfig();
+    int success = pipelineTest.EBOConfig();
     if (!success) {
         std::cout << "Failed to initialize pipelineTest" << std::endl;
     } else {
@@ -121,7 +121,7 @@ int main() {
 
 
         //draw the triangle in the back buffer
-        pipelineTest.draw();
+        pipelineTest.drawEBO();
 
 
         glfwSwapBuffers(window); //swaps the current front buffer and back buffer

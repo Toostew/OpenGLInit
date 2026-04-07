@@ -9,7 +9,9 @@
 class pipeline {
 public:
     int shaderConfig();
+    int EBOConfig();
     void draw();
+    void drawEBO();
 private:
     unsigned int globShaderProgram;
     unsigned int globVAO;
