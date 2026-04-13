@@ -6,6 +6,7 @@
 
 #include "../include/intro.h"
 #include "../include/pipeline.h"
+#include "../include/shaderIntro.h"
 #include <glad/glad.h>
 //glad comes first because it includes the required OpenGL headers
 #include <GLFW/glfw3.h>
@@ -81,13 +82,14 @@ int main() {
 
 
 
-
+    shaderIntro shaderTest;
     pipeline pipelineTest;
     int success = pipelineTest.EBOConfig();
     if (!success) {
         std::cout << "Failed to initialize pipelineTest" << std::endl;
     } else {
         std::cout << "Success" << std::endl;
+        shaderTest.checkMaxVertexVars(); //outputs the max number of vertex attributes for input variables when making shaders
     }
 
 
@@ -116,12 +118,21 @@ int main() {
 
         //dont let the name fool you, glClearColor sets the global state variable GL_COLOR_BUFFER_BIT tp
         //a value you want
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT); //glClear sets every single pixel with the value in question (here we set as the global variable)
+
+        // update the uniform color
+        float timeValue = glfwGetTime();
+        float greenValue = sin(timeValue) / 2.0f + 0.5f;
+        int vertexColorLocation = glGetUniformLocation(pipelineTest.getGlobShaderProgram(), "sharedColour");
+        glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+
 
 
         //draw the triangle in the back buffer
         pipelineTest.drawEBO();
+
+
 
 
         glfwSwapBuffers(window); //swaps the current front buffer and back buffer
@@ -133,7 +144,7 @@ int main() {
 
     }
 
-    glfwTerminate();
+    glfwTerminate(); //cunt
     return 0;
 }
 

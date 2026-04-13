@@ -45,7 +45,8 @@ float squareVertices[] = {
 
 //we need to write our shader scripts using OpenGL Shading Language (GLSL).
 //These 2, the vertex shader accepts
-const char *vertexShaderSource = "#version 330 core\n"
+const char *vertexShaderSource =
+    "#version 330 core\n"
     //the layout (location = 0), you can imagine it as a http port. different port can handle different data
     //in this instance, the port at location 0 specifically is for vector3 coords.
     //if you wanted to handle more types of data, you need to be able to "slice" it up into parts and send them
@@ -58,11 +59,13 @@ const char *vertexShaderSource = "#version 330 core\n"
     "}\0";
 
 
-const char *fragmentShaderSource = "#version 330 core\n"
+const char *fragmentShaderSource =
+    "#version 330 core\n"
     "out vec4 FragColor;\n"
+    "uniform vec4 sharedColour;\n"
     "void main()\n"
     "{\n"
-    "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+    "   FragColor = sharedColour;\n"
     "}\0";
 
 
@@ -271,6 +274,15 @@ void pipeline::drawEBO() {
     glUseProgram(globShaderProgram);
     glBindVertexArray(globVAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+}
+
+
+unsigned int pipeline::getGlobVAO() {
+    return globVAO;
+}
+
+unsigned int pipeline::getGlobShaderProgram() {
+    return globShaderProgram;
 }
 
 

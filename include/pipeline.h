@@ -12,6 +12,8 @@ public:
     int EBOConfig();
     void draw();
     void drawEBO();
+    unsigned int getGlobShaderProgram();
+    unsigned int getGlobVAO();
 private:
     unsigned int globShaderProgram;
     unsigned int globVAO;
