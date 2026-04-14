@@ -84,13 +84,10 @@ int main() {
 
     shaderIntro shaderTest;
     pipeline pipelineTest;
-    int success = pipelineTest.EBOConfig();
-    if (!success) {
-        std::cout << "Failed to initialize pipelineTest" << std::endl;
-    } else {
-        std::cout << "Success" << std::endl;
-        shaderTest.checkMaxVertexVars(); //outputs the max number of vertex attributes for input variables when making shaders
-    }
+
+    pipelineTest.EBOConfig();
+    shaderTest.customShader();
+
 
 
 
@@ -121,24 +118,17 @@ int main() {
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT); //glClear sets every single pixel with the value in question (here we set as the global variable)
 
-        // update the uniform color
-        float timeValue = glfwGetTime();
-        float greenValue = sin(timeValue) / 2.0f + 0.5f;
-        int vertexColorLocation = glGetUniformLocation(pipelineTest.getGlobShaderProgram(), "sharedColour");
-        glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
 
 
-
-        //draw the triangle in the back buffer
-        pipelineTest.drawEBO();
+        //draw the triangle in the back buffer using EBO from pipeline obj
 
 
+        //draw the triangle in the back buffer from shaderIntro object
+        shaderTest.draw();
 
 
         glfwSwapBuffers(window); //swaps the current front buffer and back buffer
         glfwPollEvents(); //checks if any events were triggered like keyboard input
-
-
 
 
 
