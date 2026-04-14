@@ -11,7 +11,8 @@ find_package(glad CONFIG REQUIRED)
 # 2. Define the executable FIRST
 add_executable(openGLinit src/intro.cpp
         src/pipeline.cpp
-        src/shaderIntro.cpp)
+        src/shaderIntro.cpp
+        src/Shader.cpp)
 
 # 3. Link the libraries AFTER defining the executable
 target_link_libraries(openGLinit PRIVATE

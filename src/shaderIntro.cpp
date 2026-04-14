@@ -1,5 +1,6 @@
 //
 // Created by tooka on 14/04/2026.
+//  used to teach basics of shaders and shi. Mostly deprecated now
 //
 
 #include "../include/shaderIntro.h"

@@ -7,6 +7,7 @@
 #include "../include/intro.h"
 #include "../include/pipeline.h"
 #include "../include/shaderIntro.h"
+#include "../include/Shader.h"
 #include <glad/glad.h>
 //glad comes first because it includes the required OpenGL headers
 #include <GLFW/glfw3.h>
@@ -89,6 +90,10 @@ int main() {
     shaderTest.customShader();
 
 
+    Shader newShader("C:/Users/tooka/OneDrive/Desktop/testVertex.txt",
+        "C:/Users/tooka/OneDrive/Desktop/testFragment.txt");
+
+
 
 
 
@@ -124,7 +129,12 @@ int main() {
 
 
         //draw the triangle in the back buffer from shaderIntro object
-        shaderTest.draw();
+
+
+        //draw triangles using the Shader class, load externally
+        newShader.activateShader();
+        newShader.vertexSetup();
+        newShader.drawWithShader();
 
 
         glfwSwapBuffers(window); //swaps the current front buffer and back buffer
