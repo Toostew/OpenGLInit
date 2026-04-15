@@ -8,6 +8,9 @@
 #include "../include/pipeline.h"
 #include "../include/shaderIntro.h"
 #include "../include/Shader.h"
+#include "../include/texture.h"
+
+
 #include <glad/glad.h>
 //glad comes first because it includes the required OpenGL headers
 #include <GLFW/glfw3.h>
@@ -89,11 +92,11 @@ int main() {
     pipelineTest.EBOConfig();
     shaderTest.customShader();
 
+    //load shaders from these paths
+    Shader newShader("C:/Users/tooka/OneDrive/Desktop/testVertex2.txt",
+        "C:/Users/tooka/OneDrive/Desktop/testFragment2.txt");
 
-    Shader newShader("C:/Users/tooka/OneDrive/Desktop/testVertex.txt",
-        "C:/Users/tooka/OneDrive/Desktop/testFragment.txt");
-
-
+    texture textureTest;
 
 
 
@@ -118,7 +121,7 @@ int main() {
         //when it's ready, swap it with the front buffer
         //buffers contains coordinates for every single pixel, with their coresponding colours
 
-        //dont let the name fool you, glClearColor sets the global state variable GL_COLOR_BUFFER_BIT tp
+        //dont let the name fool you, glClearColor sets the global state variable GL_COLOR_BUFFER_BIT to
         //a value you want
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT); //glClear sets every single pixel with the value in question (here we set as the global variable)
@@ -133,8 +136,9 @@ int main() {
 
         //draw triangles using the Shader class, load externally
         newShader.activateShader();
-        newShader.vertexSetup();
-        newShader.drawWithShader();
+        textureTest.textureEBOConfig();
+        textureTest.genTexture();
+        textureTest.drawWithTexture();
 
 
         glfwSwapBuffers(window); //swaps the current front buffer and back buffer

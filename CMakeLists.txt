@@ -12,7 +12,10 @@ find_package(glad CONFIG REQUIRED)
 add_executable(openGLinit src/intro.cpp
         src/pipeline.cpp
         src/shaderIntro.cpp
-        src/Shader.cpp)
+        src/Shader.cpp
+        include/stb_image.h
+        src/texture.cpp
+        )
 
 # 3. Link the libraries AFTER defining the executable
 target_link_libraries(openGLinit PRIVATE
